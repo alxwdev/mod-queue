@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+
+peerDependencyRules:
+  allowedVersions:
+    # jsx-a11y 6.10.2 declares eslint <=9 but only uses context APIs that ESLint 10 keeps.
+    eslint-plugin-jsx-a11y>eslint: '10'

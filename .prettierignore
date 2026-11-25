@@ -1,2 +1,5 @@
 # The plan files are the owner's source documents: they stay as written.
 docs/plan/
+
+# Written by pnpm.
+pnpm-lock.yaml

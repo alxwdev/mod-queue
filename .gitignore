@@ -1,2 +1,14 @@
 *.local
 *.local.*
+node_modules
+.next
+coverage
+playwright-report
+test-results
+.lighthouseci
+.vercel
+*.tsbuildinfo
+.env*
+!.env.example
+apps/web/src/gql
+packages/api/src/generated
