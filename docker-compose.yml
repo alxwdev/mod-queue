@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: modqueue
+      POSTGRES_PASSWORD: modqueue
+      POSTGRES_DB: modqueue
+    ports:
+      # Localhost only: the password is public, so the database must not be reachable from the network.
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U modqueue -d modqueue']
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  db-data:

@@ -6,3 +6,10 @@ peerDependencyRules:
   allowedVersions:
     # jsx-a11y 6.10.2 declares eslint <=9 but only uses context APIs that ESLint 10 keeps.
     eslint-plugin-jsx-a11y>eslint: '10'
+
+# None of these build scripts is needed: the Prisma CLI downloads its schema engine on first use,
+# and esbuild (used by tsx) loads its platform package without the script.
+ignoredBuiltDependencies:
+  - '@prisma/engines'
+  - esbuild
+  - prisma

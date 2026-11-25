@@ -9,6 +9,8 @@
     "dev:api": "pnpm --filter @modqueue/api dev",
     "build": "pnpm --filter @modqueue/web build",
     "start": "pnpm --filter @modqueue/web start",
+    "generate": "pnpm --filter @modqueue/api prisma:generate",
+    "postinstall": "pnpm generate",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

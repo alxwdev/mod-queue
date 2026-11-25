@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL comes from prisma.config.ts (Prisma 7). On an older major add: url = env("DATABASE_URL")
+}
+
+enum ContentType {
+  POST
+  COMMENT
+}
+
+enum ContentStatus {
+  PENDING
+  APPROVED
+  REMOVED
+}
+
+enum ReportReason {
+  SPAM
+  OFF_TOPIC
+  SELF_PROMOTION
+  LOW_EFFORT
+  MISLEADING
+  RULE_BREAK
+  OTHER
+}
+
+enum ModActionType {
+  APPROVE
+  REMOVE
+  BAN
+}
+
+enum ModeratorRole {
+  MODERATOR
+  ADMIN
+}
+
+model Moderator {
+  id          String        @id @default(uuid()) @db.Uuid
+  username    String        @unique
+  displayName String
+  role        ModeratorRole @default(MODERATOR)
+  createdAt   DateTime      @default(now())
+  actions     ModAction[]
+}
+
+model Community {
+  id        String    @id @default(uuid()) @db.Uuid
+  slug      String    @unique
+  name      String
+  createdAt DateTime  @default(now())
+  contents  Content[]
+}
+
+model Author {
+  id        String      @id @default(uuid()) @db.Uuid
+  username  String      @unique
+  createdAt DateTime    @default(now())
+  contents  Content[]
+  actions   ModAction[]
+}
+
+/// A reported post or comment. Every row has at least one report.
+/// The queue = rows with status PENDING and firstReportedAt <= now (see "Time-released reports").
+model Content {
+  id              String        @id @default(uuid()) @db.Uuid
+  type            ContentType
+  title           String?       // posts only
+  body            String
+  parentTitle     String?       // comments only: title of the post they reply to
+  status          ContentStatus @default(PENDING)
+  reportCount     Int           @default(0) // denormalized for sorting
+  firstReportedAt DateTime                  // denormalized for sorting and "age"
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  communityId     String        @db.Uuid
+  authorId        String        @db.Uuid
+  community       Community     @relation(fields: [communityId], references: [id])
+  author          Author        @relation(fields: [authorId], references: [id])
+  reports         Report[]
+  actions         ModAction[]
+
+  @@index([status, firstReportedAt, id])
+  @@index([status, reportCount, firstReportedAt, id])
+  @@index([communityId, status])
+  @@index([authorId])
+}
+
+model Report {
+  id        String       @id @default(uuid()) @db.Uuid
+  reason    ReportReason
+  note      String?
+  createdAt DateTime     @default(now())
+  contentId String       @db.Uuid
+  content   Content      @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+  @@index([reason, contentId])
+  @@index([createdAt])
+}
+
+model RemovalReason {
+  id              String      @id @default(uuid()) @db.Uuid
+  title           String
+  messageTemplate String      // may contain {{username}} {{community}} {{reason}} {{duration}}
+  sortOrder       Int         @default(0)
+  archivedAt      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  actions         ModAction[]
+}
+
+/// One row per content item per command. A bulk command shares one batchId.
+/// Ban state is derived: the latest non-undone BAN action whose banExpiresAt is null (permanent) or in the future.
+model ModAction {
+  id              String         @id @default(uuid()) @db.Uuid
+  batchId         String         @db.Uuid
+  type            ModActionType
+  createdAt       DateTime       @default(now())
+  undoneAt        DateTime?
+  contentId       String         @db.Uuid
+  authorId        String         @db.Uuid // target author (denormalized for history and log filters)
+  moderatorId     String         @db.Uuid
+  removalReasonId String?        @db.Uuid
+  reasonTitle     String?        // snapshot of the reason title at action time
+  messageToUser   String?        // rendered message (placeholders already filled)
+  banDurationDays Int?           // BAN only; null = permanent
+  banExpiresAt    DateTime?
+  content         Content        @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  author          Author         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  moderator       Moderator      @relation(fields: [moderatorId], references: [id])
+  removalReason   RemovalReason? @relation(fields: [removalReasonId], references: [id])
+
+  @@index([createdAt, id])
+  @@index([batchId])
+  @@index([contentId])
+  @@index([authorId, type, createdAt])
+  @@index([moderatorId, createdAt])
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@modqueue/api",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "tsx --env-file-if-exists=../../.env src/seed/cli.ts",
+    "db:reset": "prisma migrate reset && pnpm db:seed",
+    "dev": "tsx watch --env-file-if-exists=../../.env src/dev-server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "prisma": "7.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
+  }
+}
