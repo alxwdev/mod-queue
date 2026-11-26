@@ -11,7 +11,12 @@ const enforceThresholds = process.env.COVERAGE_THRESHOLDS === '1';
 
 const config: Config = {
   testEnvironment: 'node',
-  transform: { '^.+\\.ts$': '@swc/jest' },
+  transform: { '^.+\\.[jt]s$': '@swc/jest' },
+  // Faker 10 ships only ES modules, and Jest runs in CommonJS mode: let @swc/jest compile it.
+  // The optional group matches pnpm's real path (node_modules/.pnpm/<name>@<version>/node_modules).
+  transformIgnorePatterns: [
+    '/node_modules/(?!(\\.pnpm/@faker-js\\+faker@[^/]+/node_modules/)?@faker-js/faker/)',
+  ],
   globalSetup: '<rootDir>/test/global-setup.ts',
   // All integration tests share one database: parallel workers would truncate each other's rows.
   maxWorkers: 1,
