@@ -1,6 +1,8 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  // The ESM output loads the Prisma runtime from .mjs files, which Jest's CommonJS mode cannot load.
+  moduleFormat = "cjs"
 }
 
 datasource db {

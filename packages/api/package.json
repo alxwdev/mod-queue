@@ -12,6 +12,8 @@
     "db:seed": "tsx --env-file-if-exists=../../.env src/seed/cli.ts",
     "db:reset": "prisma migrate reset && pnpm db:seed",
     "dev": "tsx watch --env-file-if-exists=../../.env src/dev-server.ts",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -20,7 +22,11 @@
     "pg": "^8.23.1"
   },
   "devDependencies": {
+    "@swc/core": "1.16.22",
+    "@swc/jest": "0.2.39",
+    "@types/jest": "30.0.0",
     "@types/node": "^24",
+    "jest": "30.5.2",
     "prisma": "7.10.1",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"
