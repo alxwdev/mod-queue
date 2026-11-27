@@ -1,0 +1,25 @@
+'use client';
+
+import { ChevronDown } from 'lucide-react';
+import type { ComponentProps } from 'react';
+import { cn } from '@/lib/cn';
+import { useFieldControl } from './field';
+import { controlClassName } from './input';
+
+/**
+ * A styled native `<select>`: the browser keeps its keyboard and phone pickers. Inside a Field it
+ * gets its id, description and error state.
+ */
+export function Select({ className, ...props }: ComponentProps<'select'>) {
+  const fieldProps = useFieldControl(props);
+  return (
+    <span className={cn('relative block', className)}>
+      <select
+        className={cn(controlClassName, 'h-9 appearance-none pr-9')}
+        {...props}
+        {...fieldProps}
+      />
+      <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-fg-muted" />
+    </span>
+  );
+}

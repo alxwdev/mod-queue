@@ -1,13 +1,10 @@
 import type { Metadata } from 'next';
+import { PageHeader } from '@/components/layout/page-header';
 
 export const metadata: Metadata = {
   title: 'Removal reasons · ModQueue',
 };
 
 export default function RemovalReasonsPage() {
-  return (
-    <main>
-      <h1>Removal reasons</h1>
-    </main>
-  );
+  return <PageHeader title="Removal reasons" />;
 }

@@ -6,7 +6,13 @@ const config: CodegenConfig = {
   generates: {
     'apps/web/src/gql/': {
       preset: 'client',
-      documents: ['apps/web/src/**/*.{ts,tsx}', '!apps/web/src/gql/**'],
+      // Tests write their own documents with `gql`: they stay out of the generated `gql.ts`, which
+      // the client bundle includes, and their operation names stay free for the app.
+      documents: [
+        'apps/web/src/**/*.{ts,tsx}',
+        '!apps/web/src/gql/**',
+        '!apps/web/src/**/*.test.{ts,tsx}',
+      ],
       presetConfig: { fragmentMasking: false },
       config: {
         // client-preset 7 replaced `enumsAsTypes` with `enumType`.
