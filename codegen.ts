@@ -30,6 +30,8 @@ const config: CodegenConfig = {
           // The parent carries the filter, so that `totalCount` resolves only when requested.
           ContentConnection: '../services/queue-service#QueueConnection',
           ModActionConnection: '../services/mod-log-service#ModLogConnection',
+          // Each field has its own resolver, so it runs only when requested.
+          QueueHealth: '../services/health-service#QueueHealthParent',
         },
         // The Prisma models have the same names as the GraphQL types they map to.
         mapperTypeSuffix: 'Model',

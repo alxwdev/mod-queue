@@ -86,6 +86,10 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `modLog` filters `from <= createdAt < to`: `from` is inclusive, `to` exclusive. For a date range from `<input type="date">`, send the start of the first day as `from` and the start of the day after the last day as `to`. (from 3.4)
 - `filter.search` is trimmed; a blank search filters nothing. Over 100 characters after trimming gives `BAD_USER_INPUT` with `fieldErrors['filter.search']`, so give the input `maxLength={100}`. `%`, `_` and `\` are plain characters. (from 3.4)
 
+## 10.2
+
+- `reportsPerHour(hours)` returns exactly `hours` UTC buckets, oldest first; the last bucket is the current hour and is incomplete, so a lower last value is not a drop. `medianTimeToAction(days)` returns exactly `days` UTC days that end with today (also incomplete); `topReasons(days)` counts the same days. The API clamps `hours` to 1..168, `days` to 1..30 and `limit` to 1..10. Each `QueueHealth` field is a field resolver, so a query for `summary` alone runs no chart queries. (from 3.5)
+
 ## 10.4
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
