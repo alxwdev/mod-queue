@@ -23,6 +23,12 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `src/loaders.ts` already has all six loaders. `reasonCounts` counts all reports of a content, so the sum equals `reportCount`; `authorStats` counts each REMOVE action as one removal and each BAN batch as one ban; `activeBans` returns the latest ban among the bans that are permanent or not expired at `now()`. (from 2.5)
 - `testPrisma` emits no query events, because `createPrismaClient` sets no `log` option. The test "a page of 50 runs ≤ 6 SQL queries" needs another way to count the queries. (from 2.5)
 
+## 4.1
+
+- `globals.css` removes Tailwind's own colours, text sizes, radii and shadows: `bg-white`, `text-2xl`, `rounded-xl` and `shadow-xl` give no CSS. The tokens and their utilities are in `docs/design-tokens.md`. (from 2.6)
+- `@theme inline` does not put `--color-*` variables on `:root`: `var(--color-focus)` (the focus ring rule in `design.md`) is undefined at runtime. Use the utilities (`outline-focus`) or the `:root` variables (`var(--focus)`). (from 2.6)
+- Check that `tailwind-merge` in `cn()` knows the custom utilities `duration-fast`, `duration-base`, `z-sticky`, `z-overlay`, `z-dropdown` and `z-toast`. If it does not, `cn('duration-fast', 'duration-base')` keeps both classes: extend its config (`extendTailwindMerge`) and test the merge. (from 2.6)
+
 ## 4.3
 
 - Apollo Client 4 needs `graphql` as a peer dependency. Add `graphql` 16.15.0 to `@modqueue/web`, not 17 (`latest`): Apollo Server 5 needs `^16.11.0`, and the repo must keep one copy of `graphql`. (from 2.4)

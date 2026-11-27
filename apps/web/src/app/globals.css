@@ -1,1 +1,134 @@
 @import 'tailwindcss';
+
+/* Dark mode is backlog item N2. Until then no element sets data-theme, so dark: utilities never apply. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * The values that a theme or a media query changes. design.md is the source; docs/design-tokens.md
+ * lists them with their contrast ratios. Change all three files together.
+ */
+:root {
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --line: #e3e6eb;
+  --line-strong: #7f8796;
+  --fg: #1a1d23;
+  --fg-muted: #4b5563;
+  --fg-subtle: #5e6776;
+  --accent: #3451d1;
+  --accent-hover: #2a41ae;
+  --accent-fg: #ffffff;
+  --accent-subtle: #edf0fd;
+  --focus: #2563eb;
+  --success: #17794a;
+  --success-subtle: #e4f4ea;
+  --warning: #8a5a00;
+  --warning-subtle: #fdf1d3;
+  --danger: #c02626;
+  --danger-hover: #a11e1e;
+  --danger-fg: #ffffff;
+  --danger-subtle: #fceaea;
+  --row-active: #eef1f6;
+  --row-selected: #e3e9fd;
+  --chart-1: #3451d1;
+  --chart-2: #783c84;
+  --chart-3: #6c8418;
+  --chart-4: #0c9cb4;
+  --chart-5: #fc486c;
+  --scrim: rgb(16 24 40 / 0.4);
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+}
+
+[data-theme='dark'] {
+  /* N2: the dark values of the :root variables above. */
+}
+
+/*
+ * `inline` makes the utilities use var(--canvas) itself, so a theme block that changes --canvas
+ * changes every utility. The reset leaves only these colours: bg-red-500 and the like give no CSS.
+ */
+@theme inline {
+  --color-*: initial;
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-focus: var(--focus);
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-row-active: var(--row-active);
+  --color-row-selected: var(--row-selected);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-scrim: var(--scrim);
+
+  /* duration-fast and duration-base; the plain transition utilities follow the fast token too. */
+  --transition-duration-fast: var(--duration-fast);
+  --transition-duration-base: var(--duration-base);
+  --default-transition-duration: var(--duration-fast);
+
+  /* --font-inter comes from next/font in layout.tsx. kbd keeps Tailwind's ui-monospace stack. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * The fixed scales of design.md; the resets remove Tailwind's other sizes. `static` puts every
+ * variable on :root, so /dev/ui can show its value.
+ */
+@theme static {
+  /* 12/16, 14/20, 16/24, 18/28 and 20/28 px in rem, so the text follows the browser font size. */
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+
+  --radius-*: initial;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --shadow-*: initial;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-md: 0 4px 12px rgb(16 24 40 / 0.1);
+  --shadow-lg: 0 12px 32px rgb(16 24 40 / 0.16);
+
+  /* Radix portals menus and tooltips to <body>: a menu opened in a dialog must cover the scrim. */
+  --z-index-sticky: 10;
+  --z-index-overlay: 20;
+  --z-index-dropdown: 30;
+  --z-index-toast: 40;
+}
