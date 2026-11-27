@@ -6,6 +6,7 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - If an MSW update adds another dependency that ships only ES modules, the web tests fail with "Must use import to load ES Module". Add the package to `esmPackages` in `apps/web/jest.config.ts`. (from 2.1)
 - `pnpm test:e2e` tests the last `pnpm build`: after a code change, build first. (from 2.2)
+- If `pnpm install` warns "Ignored build scripts" for a new package, stop and ask the owner to run `pnpm approve-builds`. Do not add the package to `ignoredBuiltDependencies` by hand: pnpm then keeps the old entry in `node_modules/.modules.yaml` and repeats the warning. After the owner's choice, add the comment that says why the package needs no build. (from 2.4)
 
 ## 2.4
 
@@ -15,6 +16,11 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - Next.js reads `.env` files only from `apps/web/`, so the app does not see the root `.env`. Decide how `getPrisma()` gets `DATABASE_URL` locally. (from 1.4)
 - The Prisma generator has `moduleFormat = "cjs"`, because Jest's CommonJS mode cannot load the ES-module runtime. Check that this CJS client works in Next.js. (from 1.5)
+
+## 4.3
+
+- Apollo Client 4 needs `graphql` as a peer dependency. Add `graphql` 16.15.0 to `@modqueue/web`, not 17 (`latest`): Apollo Server 5 needs `^16.11.0`, and the repo must keep one copy of `graphql`. (from 2.4)
+- `client-preset` 7 generates types only for the operations and fragments in the documents. `@/gql/graphql` has no type for every schema type, and an enum union exists only when a document uses that enum. For enum values in UI code, use the constants of `@modqueue/shared`. (from 2.4)
 
 ## 4.4
 

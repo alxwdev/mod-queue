@@ -22,7 +22,8 @@ export default defineConfig(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        // codegen.ts is the only TypeScript file at the root, where no tsconfig exists.
+        projectService: { allowDefaultProject: ['codegen.ts'] },
         tsconfigRootDir: import.meta.dirname,
       },
     },

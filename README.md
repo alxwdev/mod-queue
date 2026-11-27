@@ -15,7 +15,7 @@ cp .env.example .env
 pnpm db:up        # Postgres 17 in Docker
 pnpm db:migrate   # apply the migrations
 pnpm db:seed      # deterministic demo data
-pnpm --filter @modqueue/web dev
+pnpm dev
 ```
 
 Then open http://localhost:3000.
