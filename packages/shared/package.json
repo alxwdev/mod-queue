@@ -10,6 +10,9 @@
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
   "devDependencies": {
     "@swc/core": "1.16.22",
     "@swc/jest": "0.2.39",

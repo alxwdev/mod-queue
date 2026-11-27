@@ -8,6 +8,9 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `pnpm test:e2e` tests the last `pnpm build`: after a code change, build first. (from 2.2)
 - If `pnpm install` warns "Ignored build scripts" for a new package, stop and ask the owner to run `pnpm approve-builds`. Do not add the package to `ignoredBuiltDependencies` by hand: pnpm then keeps the old entry in `node_modules/.modules.yaml` and repeats the warning. After the owner's choice, add the comment that says why the package needs no build. (from 2.4)
 - `next.config.ts` loads the root `.env`, and Next.js does not watch that file: after a change to `.env`, restart `pnpm dev`. (from 2.5)
+- `testPrisma` emits Prisma query events: count the SQL queries of an operation with `testPrisma.$on('query', …)`. A listener cannot be removed, so keep its counter in the test. Prisma batches the `findUnique` calls of one tick into one query, so a throwaway N+1 check needs another query, such as `findFirst`. (from 3.1)
+- In test files, ESLint's `testing-library/render-result-naming-convention` takes a variable that holds the result of any `render…` function, also `renderTemplate`, for a render result: `const message = renderTemplate(…)` fails lint. Call the function inline. (from 3.2)
+- In tests, `@typescript-eslint/no-unsafe-assignment` fails on `expect.any(…)` and `expect.objectContaining(…)` as the value of an object property (`{ batchId: expect.any(String) }`); in an array (`[expect.any(String)]`) they pass. Use `toMatchObject` with plain values, or `toHaveProperty('a.b', expect.any(String))`. (from 3.2)
 
 ## 2.4
 
@@ -22,6 +25,19 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - `src/loaders.ts` already has all six loaders. `reasonCounts` counts all reports of a content, so the sum equals `reportCount`; `authorStats` counts each REMOVE action as one removal and each BAN batch as one ban; `activeBans` returns the latest ban among the bans that are permanent or not expired at `now()`. (from 2.5)
 - `testPrisma` emits no query events, because `createPrismaClient` sets no `log` option. The test "a page of 50 runs ≤ 6 SQL queries" needs another way to count the queries. (from 2.5)
+
+## 3.3
+
+- `@modqueue/shared` has `findUnknownPlaceholders(template)`: it returns each unknown name once, without the braces. Any text between double braces is a placeholder, so `{{ username }}` (with spaces) is unknown. `zod` is already a dependency of `@modqueue/shared`. (from 3.2)
+
+## 3.4
+
+- A `totalCount` field resolver needs a codegen mapper for its connection type: `codegen.ts` maps `ContentConnection` to `QueueConnection` of `queue-service.ts`, which carries the filter. `src/lib/cursor.ts` has `encodeCursor`, `decodeCursor`, `invalidCursor` and `clampFirst`. (from 3.1)
+- `Author.history` returns `ModAction` rows: their fields `moderator`, `content` and `author` fail until this task adds their resolvers. (from 3.1)
+
+## 3.5
+
+- `countQueue(ctx, null)` in `queue-service.ts` counts the visible pending items: the `pendingCount` of the summary. (from 3.1)
 
 ## 4.1
 
@@ -43,6 +59,36 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
 - `reportError(error, { operationName })` in `src/server/graphql.ts` gets the original error of a resolver, and also a failed context (for example, the database is down) with `operationName: null`. Apollo does not log these errors, so until Sentry is connected they appear only in the responses. (from 2.5)
+
+## 6.4
+
+- The API orders `id` as Postgres orders `uuid`: by bytes, which is the order of the lowercase hex strings that the API returns. In `compareQueueItems`, compare ids with `<` and `>`, not with `localeCompare`. (from 3.1)
+
+## 7.1
+
+- `approveContent`, `removeContent` and `banAuthor` return the `results` in the order of the input ids. The `content` of a result is `null` only for `NOT_FOUND`; `handledBy` can also be `null` for `ALREADY_HANDLED` (an item without a non-undone action). (from 3.2)
+- `undoModeration` gives `NOT_FOUND` for a batch that is already undone, also when a parallel undo of the same batch won: handle it like `UNDO_EXPIRED` and `FORBIDDEN`. `restored` has no defined order and holds only the items that still had the status that the batch set. (from 3.2)
+
+## 9.1
+
+- `removeInputSchema` and `banInputSchema` turn a missing, null or blank `messageToUser` into `null`. `banInputSchema` requires `durationDays` (`null` = permanent): `toBanInput` must always set it. (from 3.2)
+
+## 9.2
+
+- `message-preview.tsx`: fill `{{duration}}` with `formatBanDuration(durationDays)` of `@modqueue/shared` only in ban mode, as the API does. In remove mode the API leaves `{{duration}}` as it is. `{{community}}` is the community name, `{{reason}}` the title of the removal reason. (from 3.2)
+
+## 9.3
+
+- `removalReasonSchema` trims `title` and `messageTemplate`, so its input and output types differ: with `zodResolver`, send the parsed (trimmed) values. The API returns `fieldErrors` with the keys `title` and `messageTemplate`: map them to the form fields with `setError`. `updateRemovalReason` and `archiveRemovalReason` give `NOT_FOUND` for an unknown id; archiving an archived reason returns it unchanged. New reasons go to the end of the list (highest `sortOrder` + 1). (from 3.3)
+
+## 10.1
+
+- `modLog` filters `from <= createdAt < to`: `from` is inclusive, `to` exclusive. For a date range from `<input type="date">`, send the start of the first day as `from` and the start of the day after the last day as `to`. (from 3.4)
+- `filter.search` is trimmed; a blank search filters nothing. Over 100 characters after trimming gives `BAD_USER_INPUT` with `fieldErrors['filter.search']`, so give the input `maxLength={100}`. `%`, `_` and `\` are plain characters. (from 3.4)
+
+## 10.2
+
+- `reportsPerHour(hours)` returns exactly `hours` UTC buckets, oldest first; the last bucket is the current hour and is incomplete, so a lower last value is not a drop. `medianTimeToAction(days)` returns exactly `days` UTC days that end with today (also incomplete); `topReasons(days)` counts the same days. The API clamps `hours` to 1..168, `days` to 1..30 and `limit` to 1..10. Each `QueueHealth` field is a field resolver, so a query for `summary` alone runs no chart queries. (from 3.5)
 
 ## 10.4
 

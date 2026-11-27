@@ -1,7 +1,12 @@
-import { createPrismaClient } from '../src/db';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../src/generated/prisma/client';
 
 /** Prisma client for the test database. global-setup.ts has already checked and migrated it. */
-export const testPrisma = createPrismaClient(process.env.DATABASE_URL_TEST ?? '');
+export const testPrisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL_TEST ?? '' }),
+  // Query events let a test count the SQL queries of an operation: testPrisma.$on('query', …).
+  log: [{ emit: 'event', level: 'query' }],
+});
 
 // Jest gives every test file its own module registry, so every file gets its own client.
 // Close its connection pool when the file ends, or the open connections keep Jest from exiting.
