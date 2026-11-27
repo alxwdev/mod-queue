@@ -1,5 +1,6 @@
 import type { Resolvers } from '../generated/resolvers-types';
 import { authorResolvers, contentQueryResolvers, contentResolvers } from './content';
+import { moderationMutationResolvers } from './moderation';
 import { contentConnectionResolvers, queueQueryResolvers } from './queue';
 import { dateTimeScalar } from './scalars';
 
@@ -12,6 +13,9 @@ export const resolvers: Resolvers = {
       prisma.moderator.findMany({ orderBy: { username: 'asc' } }),
     ...queueQueryResolvers,
     ...contentQueryResolvers,
+  },
+  Mutation: {
+    ...moderationMutationResolvers,
   },
   ContentConnection: contentConnectionResolvers,
   Content: contentResolvers,
