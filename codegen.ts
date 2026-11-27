@@ -27,6 +27,8 @@ const config: CodegenConfig = {
           ModAction: './prisma/client#ModAction',
           RemovalReason: './prisma/client#RemovalReason',
           Report: './prisma/client#Report',
+          // The parent carries the filter, so that `totalCount` resolves only when requested.
+          ContentConnection: '../services/queue-service#QueueConnection',
         },
         // The Prisma models have the same names as the GraphQL types they map to.
         mapperTypeSuffix: 'Model',
