@@ -30,6 +30,27 @@ describe('DevUiPage', () => {
     }
   });
 
+  it('shows a section for every UI kit component', () => {
+    renderWithProviders(<DevUiPage />, { route: '/dev/ui' });
+
+    for (const name of [
+      'Button',
+      'IconButton',
+      'Kbd',
+      'Badge',
+      'Checkbox',
+      'Switch',
+      'RadioGroup',
+      'Tooltip',
+      'Field, Input, Textarea, Select',
+      'Skeleton',
+      'Spinner',
+      'VisuallyHidden',
+    ]) {
+      expect(screen.getByRole('heading', { level: 3, name })).toBeInTheDocument();
+    }
+  });
+
   it('shows the value that the browser gives a token', () => {
     document.documentElement.style.setProperty('--canvas', 'value-of-canvas');
 

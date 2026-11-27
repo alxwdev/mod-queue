@@ -11,6 +11,9 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `testPrisma` emits Prisma query events: count the SQL queries of an operation with `testPrisma.$on('query', …)`. A listener cannot be removed, so keep its counter in the test. Prisma batches the `findUnique` calls of one tick into one query, so a throwaway N+1 check needs another query, such as `findFirst`. (from 3.1)
 - In test files, ESLint's `testing-library/render-result-naming-convention` takes a variable that holds the result of any `render…` function, also `renderTemplate`, for a render result: `const message = renderTemplate(…)` fails lint. Call the function inline. (from 3.2)
 - In tests, `@typescript-eslint/no-unsafe-assignment` fails on `expect.any(…)` and `expect.objectContaining(…)` as the value of an object property (`{ batchId: expect.any(String) }`); in an array (`[expect.any(String)]`) they pass. Use `toMatchObject` with plain values, or `toHaveProperty('a.b', expect.any(String))`. (from 3.2)
+- The focus ring is one global `:focus-visible` rule in `globals.css` (2 px `--focus` outline, offset 2 px). Components add no outline classes; an element that needs another offset overrides it with a utility (`-outline-offset-2`). (from 4.1)
+- In Jest, a Radix RadioGroup selects an item on an arrow key only while the key is down, and Radix moves the focus in a timeout: `user.keyboard('{ArrowDown}')` moves the focus but selects nothing. Hold the key: `await user.keyboard('{ArrowDown>}')`, then `await user.keyboard('{/ArrowDown}')`. (from 4.1)
+- Every `Tooltip` and `IconButton` needs a `TooltipProvider` (`components/ui/tooltip.tsx`, 400 ms delay) above it, or Radix throws. Until `renderWithProviders` has it (task 4.4), render with `{ wrapper: TooltipProvider }`. (from 4.1)
 
 ## 2.4
 
@@ -54,11 +57,16 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - The four stub pages in `apps/web/src/app/(console)/` wrap their `<h1>` in `<main>`, so the axe checks find a main landmark. Remove these `<main>` elements when `AppShell` adds `main#main`. (from 1.3)
 - The API compares the value of the cookie `mq_moderator` as it is, without URL decoding: write the plain username. The header `x-moderator` wins over the cookie, so the app must not send that header. (from 2.5)
+- `/dev/ui` wraps its "Components" section in its own `TooltipProvider`. When `providers.tsx` adds the Tooltip provider to the root layout, remove that wrapper from `app/dev/ui/page.tsx`. (from 4.1)
 
 ## 5.1
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
 - `reportError(error, { operationName })` in `src/server/graphql.ts` gets the original error of a resolver, and also a failed context (for example, the database is down) with `operationName: null`. Apollo does not log these errors, so until Sentry is connected they appear only in the responses. (from 2.5)
+
+## 5.4
+
+- Queue rows set the focus ring offset to `-2px` (`design.md`): add `-outline-offset-2` to the row. The global `:focus-visible` rule in `globals.css` gives the rest of the ring. (from 4.1)
 
 ## 6.4
 

@@ -1,5 +1,22 @@
+import { Check, Settings, Trash2, Undo2, X } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Field } from '@/components/ui/field';
+import { IconButton } from '@/components/ui/icon-button';
+import { Input } from '@/components/ui/input';
+import { Kbd } from '@/components/ui/kbd';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Spinner } from '@/components/ui/spinner';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipProvider } from '@/components/ui/tooltip';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { CssVariableValue } from './css-variable-value';
 
 export const metadata: Metadata = {
@@ -86,6 +103,38 @@ const shadows = [
   { token: 'shadow-md', className: 'shadow-md' },
   { token: 'shadow-lg', className: 'shadow-lg' },
 ] as const;
+
+const buttonVariantNames = ['primary', 'secondary', 'ghost', 'danger'] as const;
+const sizes = ['sm', 'md', 'lg'] as const;
+const badgeVariantNames = ['neutral', 'accent', 'success', 'warning', 'danger'] as const;
+
+function ComponentSection({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section aria-labelledby={id} className="space-y-3">
+      <h3 id={id} className="text-base font-semibold">
+        {title}
+      </h3>
+      <div className="space-y-4 rounded-md border border-line bg-surface p-4">{children}</div>
+    </section>
+  );
+}
+
+function Example({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-fg-muted">{label}</p>
+      <div className="flex flex-wrap items-center gap-3">{children}</div>
+    </div>
+  );
+}
 
 export default function DevUiPage() {
   // A page for manual QA: not part of the production app.
@@ -211,6 +260,211 @@ export default function DevUiPage() {
           </ul>
         </section>
       </section>
+
+      <TooltipProvider>
+        <section aria-labelledby="components" className="space-y-8">
+          <h2 id="components" className="text-lg font-semibold">
+            Components
+          </h2>
+
+          <ComponentSection id="button" title="Button">
+            {sizes.map((size) => (
+              <Example key={size} label={`Size ${size}`}>
+                {buttonVariantNames.map((variant) => (
+                  <Button key={variant} variant={variant} size={size}>
+                    {variant}
+                  </Button>
+                ))}
+              </Example>
+            ))}
+            <Example label="With an icon">
+              <Button variant="primary">
+                <Check />
+                Approve
+              </Button>
+              <Button variant="danger" size="lg">
+                <Trash2 />
+                Remove
+              </Button>
+            </Example>
+            <Example label="Disabled">
+              {buttonVariantNames.map((variant) => (
+                <Button key={variant} variant={variant} disabled>
+                  {variant}
+                </Button>
+              ))}
+            </Example>
+            <Example label="Loading (keeps its width, aria-busy)">
+              {buttonVariantNames.map((variant) => (
+                <Button key={variant} variant={variant} loading>
+                  {variant}
+                </Button>
+              ))}
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="icon-button" title="IconButton">
+            {sizes.map((size) => (
+              <Example key={size} label={`Size ${size}; hover or focus shows the label`}>
+                <IconButton label="Close" variant="ghost" size={size}>
+                  <X />
+                </IconButton>
+                <IconButton label="Undo" size={size}>
+                  <Undo2 />
+                </IconButton>
+                <IconButton label="Settings" variant="primary" size={size}>
+                  <Settings />
+                </IconButton>
+                <IconButton label="Remove" variant="danger" size={size}>
+                  <Trash2 />
+                </IconButton>
+              </Example>
+            ))}
+            <Example label="Disabled and loading">
+              <IconButton label="Undo (disabled)" disabled>
+                <Undo2 />
+              </IconButton>
+              <IconButton label="Remove (loading)" variant="danger" loading>
+                <Trash2 />
+              </IconButton>
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="kbd" title="Kbd">
+            <p className="text-sm">
+              Press <Kbd>J</Kbd> or <Kbd>K</Kbd> to move, <Kbd>?</Kbd> for help, <Kbd>Ctrl</Kbd> +{' '}
+              <Kbd>Enter</Kbd> to submit.
+            </p>
+          </ComponentSection>
+
+          <ComponentSection id="badge" title="Badge">
+            <Example label="Variants">
+              {badgeVariantNames.map((variant) => (
+                <Badge key={variant} variant={variant}>
+                  {variant}
+                </Badge>
+              ))}
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="checkbox" title="Checkbox">
+            <div className="flex flex-col gap-3">
+              <Checkbox label="Unchecked" />
+              <Checkbox label="Checked" defaultChecked />
+              <Checkbox label="Indeterminate" checked="indeterminate" />
+              <Checkbox label="Disabled" disabled />
+              <Checkbox label="Disabled and checked" disabled defaultChecked />
+            </div>
+          </ComponentSection>
+
+          <ComponentSection id="switch" title="Switch">
+            <div className="flex max-w-sm flex-col gap-4">
+              <Switch
+                label="Single-key shortcuts"
+                description="J, K, A, R, B, Z and ? work without a modifier key."
+              />
+              <Switch label="On" defaultChecked />
+              <Switch label="Disabled" disabled />
+              <Switch label="Disabled and on" disabled defaultChecked />
+            </div>
+          </ComponentSection>
+
+          <ComponentSection id="radio-group" title="RadioGroup">
+            <RadioGroup label="Sort" description="The order of the queue." defaultValue="oldest">
+              <RadioGroupItem value="oldest" label="Oldest first" />
+              <RadioGroupItem value="newest" label="Newest first" />
+              <RadioGroupItem
+                value="reports"
+                label="Most reports"
+                description="Equal counts: oldest first."
+              />
+              <RadioGroupItem value="score" label="Disabled" disabled />
+            </RadioGroup>
+          </ComponentSection>
+
+          <ComponentSection id="tooltip" title="Tooltip">
+            <Example label="Opens after 400 ms on hover, at once on keyboard focus">
+              <Tooltip content="Approves the current item">
+                <Button>Hover or focus me</Button>
+              </Tooltip>
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="field" title="Field, Input, Textarea, Select">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Title">
+                <Input placeholder="Spam or scam" />
+              </Field>
+              <Field label="Title" description="Shown in the remove dialog.">
+                <Input defaultValue="Spam" />
+              </Field>
+              <Field label="Title" error="Enter a title.">
+                <Input />
+              </Field>
+              <Field label="Title (disabled)">
+                <Input defaultValue="Spam" disabled />
+              </Field>
+              <Field
+                label="Message to the user"
+                description="Placeholders: {{username}}, {{community}}."
+              >
+                <Textarea placeholder="Hi {{username}}, …" />
+              </Field>
+              <Field label="Message to the user" error="Use at most 1,000 characters.">
+                <Textarea defaultValue="Hi {{username}}," />
+              </Field>
+              <Field label="Ban duration">
+                <Select defaultValue="7">
+                  <option value="1">1 day</option>
+                  <option value="7">7 days</option>
+                  <option value="30">30 days</option>
+                  <option value="permanent">Permanent</option>
+                </Select>
+              </Field>
+              <Field label="Ban duration" error="Choose a duration.">
+                <Select defaultValue="">
+                  <option value="">Choose…</option>
+                  <option value="1">1 day</option>
+                </Select>
+              </Field>
+              <Field label="Ban duration (disabled)">
+                <Select disabled>
+                  <option>7 days</option>
+                </Select>
+              </Field>
+            </div>
+          </ComponentSection>
+
+          <ComponentSection id="skeleton" title="Skeleton">
+            <div className="flex gap-3">
+              <Skeleton className="size-10" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            </div>
+          </ComponentSection>
+
+          <ComponentSection id="spinner" title="Spinner">
+            <Example label="Default label and a custom label">
+              <Spinner />
+              <Spinner label="Loading the queue" />
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="visually-hidden" title="VisuallyHidden">
+            <Example label="The button's name is visually hidden text">
+              <button
+                type="button"
+                className="inline-flex size-9 items-center justify-center rounded-md text-fg-muted hover:bg-canvas"
+              >
+                <X className="size-4" />
+                <VisuallyHidden>Close</VisuallyHidden>
+              </button>
+            </Example>
+          </ComponentSection>
+        </section>
+      </TooltipProvider>
     </main>
   );
 }
