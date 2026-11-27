@@ -26,9 +26,11 @@ describe('row loaders', () => {
   it('return the rows in the order of the keys', async () => {
     const [first, second] = [await createAuthor(), await createAuthor()];
     const [community, moderator] = [await createCommunity(), await createModerator()];
-    const { authors, communities, moderators } = loaders();
+    const content = await createContent();
+    const { authors, contents, communities, moderators } = loaders();
 
     expect(await authors.loadMany([second.id, first.id])).toEqual([second, first]);
+    expect(await contents.load(content.id)).toEqual(content);
     expect(await communities.load(community.id)).toEqual(community);
     expect(await moderators.load(moderator.id)).toEqual(moderator);
   });

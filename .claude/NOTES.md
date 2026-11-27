@@ -81,6 +81,11 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - `removalReasonSchema` trims `title` and `messageTemplate`, so its input and output types differ: with `zodResolver`, send the parsed (trimmed) values. The API returns `fieldErrors` with the keys `title` and `messageTemplate`: map them to the form fields with `setError`. `updateRemovalReason` and `archiveRemovalReason` give `NOT_FOUND` for an unknown id; archiving an archived reason returns it unchanged. New reasons go to the end of the list (highest `sortOrder` + 1). (from 3.3)
 
+## 10.1
+
+- `modLog` filters `from <= createdAt < to`: `from` is inclusive, `to` exclusive. For a date range from `<input type="date">`, send the start of the first day as `from` and the start of the day after the last day as `to`. (from 3.4)
+- `filter.search` is trimmed; a blank search filters nothing. Over 100 characters after trimming gives `BAD_USER_INPUT` with `fieldErrors['filter.search']`, so give the input `maxLength={100}`. `%`, `_` and `\` are plain characters. (from 3.4)
+
 ## 10.4
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)

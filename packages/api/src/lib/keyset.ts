@@ -34,6 +34,11 @@ function parseValues<T extends z.ZodType>(schema: T, values: CursorValue[]): z.o
   return result.data;
 }
 
+/** The `[date, id]` values of a cursor, or throws `BAD_USER_INPUT`. */
+export function parseTimeAndId(cursorValues: CursorValue[]): [Date, string] {
+  return parseValues(timeAndIdValues, cursorValues);
+}
+
 function afterTimeAndId(ascending: boolean, at: Date, id: string): Prisma.ContentWhereInput {
   return ascending
     ? { OR: [{ firstReportedAt: { gt: at } }, { firstReportedAt: at, id: { gt: id } }] }

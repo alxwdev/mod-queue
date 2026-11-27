@@ -1,6 +1,12 @@
 import { REPORT_REASONS } from '@modqueue/shared';
 import DataLoader from 'dataloader';
-import type { Author, Community, Moderator, PrismaClient } from './generated/prisma/client';
+import type {
+  Author,
+  Community,
+  Content,
+  Moderator,
+  PrismaClient,
+} from './generated/prisma/client';
 import type { ReportReason } from './generated/prisma/enums';
 import type { Clock } from './lib/clock';
 
@@ -22,6 +28,8 @@ export interface ActiveBan {
 
 export interface Loaders {
   authors: DataLoader<string, Author>;
+  /** Content by id, of any status and visibility: the content of a mod action. */
+  contents: DataLoader<string, Content>;
   communities: DataLoader<string, Community>;
   moderators: DataLoader<string, Moderator>;
   /** Report counts per reason of a content, count descending. */
@@ -52,6 +60,9 @@ export function createLoaders(prisma: PrismaClient, now: Clock): Loaders {
   return {
     authors: new DataLoader(async (ids) =>
       orderById(ids, await prisma.author.findMany({ where: { id: { in: [...ids] } } }), 'Author'),
+    ),
+    contents: new DataLoader(async (ids) =>
+      orderById(ids, await prisma.content.findMany({ where: { id: { in: [...ids] } } }), 'Content'),
     ),
     communities: new DataLoader(async (ids) =>
       orderById(
