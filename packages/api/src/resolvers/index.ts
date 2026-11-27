@@ -2,6 +2,7 @@ import type { Resolvers } from '../generated/resolvers-types';
 import { authorResolvers, contentQueryResolvers, contentResolvers } from './content';
 import { moderationMutationResolvers } from './moderation';
 import { contentConnectionResolvers, queueQueryResolvers } from './queue';
+import { removalReasonMutationResolvers, removalReasonQueryResolvers } from './removal-reasons';
 import { dateTimeScalar } from './scalars';
 
 // The Day 3 tasks add the queue, moderation, mod log, removal reason and health resolvers.
@@ -13,9 +14,11 @@ export const resolvers: Resolvers = {
       prisma.moderator.findMany({ orderBy: { username: 'asc' } }),
     ...queueQueryResolvers,
     ...contentQueryResolvers,
+    ...removalReasonQueryResolvers,
   },
   Mutation: {
     ...moderationMutationResolvers,
+    ...removalReasonMutationResolvers,
   },
   ContentConnection: contentConnectionResolvers,
   Content: contentResolvers,

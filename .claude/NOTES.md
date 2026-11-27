@@ -77,6 +77,10 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - `message-preview.tsx`: fill `{{duration}}` with `formatBanDuration(durationDays)` of `@modqueue/shared` only in ban mode, as the API does. In remove mode the API leaves `{{duration}}` as it is. `{{community}}` is the community name, `{{reason}}` the title of the removal reason. (from 3.2)
 
+## 9.3
+
+- `removalReasonSchema` trims `title` and `messageTemplate`, so its input and output types differ: with `zodResolver`, send the parsed (trimmed) values. The API returns `fieldErrors` with the keys `title` and `messageTemplate`: map them to the form fields with `setError`. `updateRemovalReason` and `archiveRemovalReason` give `NOT_FOUND` for an unknown id; archiving an archived reason returns it unchanged. New reasons go to the end of the list (highest `sortOrder` + 1). (from 3.3)
+
 ## 10.4
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
