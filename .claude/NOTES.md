@@ -17,6 +17,10 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `Dialog` and `Sheet` have an `IconButton` (Close), so they need a `TooltipProvider` too. `ToastProvider` brings its own for the Close buttons of the toasts. (from 4.2)
 - In Jest, while a Radix `Dialog`, `AlertDialog` or `Sheet` is open, Radix sets `aria-hidden` on the rest of the page: `getByRole` finds an element there only with `{ hidden: true }`. After a close, Radix moves the focus in a timeout: check a focus that `onCloseAutoFocus` sets inside `waitFor`. (from 4.2)
 - Radix Toast checks `event.code` for its `F8` key, and `user.keyboard('{F8}')` sends no code: press `user.keyboard('[F8]')`. Radix writes the text of a toast announcement (`role="status"`) on the next frame: check it inside `waitFor`. (from 4.2)
+- `jest.mock('@/…')` fails with "Cannot find module": SWC resolves the `@/` alias only in imports, and the web Jest config has no `moduleNameMapper` for it. Give `jest.mock()` a relative path. (from 4.3)
+- Codegen leaves out `apps/web/src/**/*.test.{ts,tsx}` (owner's choice in 4.3). A test that needs its own GraphQL document writes it with `gql` from `@apollo/client` and a hand-written `TypedDocumentNode` type; a feature test imports the feature's documents. (from 4.3)
+- The codegen watcher of `pnpm dev` does not reload `codegen.ts`: after a change to it, restart `pnpm dev`, or the watcher keeps writing the old output into `apps/web/src/gql/`. (from 4.3)
+- An MSW `graphql.query()` resolver must return a GraphQL body (TypeScript checks it). For a response that is not GraphQL, such as a 502 with text, use `http.post('/api/graphql', …)`. (from 4.3)
 
 ## 2.4
 
@@ -63,11 +67,14 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `/dev/ui` wraps its "Components" section in its own `TooltipProvider`. When `providers.tsx` adds the Tooltip provider to the root layout, remove that wrapper from `app/dev/ui/page.tsx`. (from 4.1)
 - `/dev/ui` wraps its Toast example in its own `ToastProvider`. When `providers.tsx` adds the Toast provider, remove that wrapper from `app/dev/ui/page.tsx`. (from 4.2)
 - The menu sheet: `Sheet` takes `title` (required), `description`, `side` (`"right"` or `"full"`), `trigger`, `footer`, `open`/`onOpenChange` and `data-hotkeys-scope`. On open, Radix focuses the first control of the body; Close is the last control. (from 4.2)
+- `renderWithProviders` passes `ApolloProvider` (`lib/apollo/apollo-provider.tsx`) as the `wrapper` of `render`, so `rerender` keeps the providers. Put all providers into one wrapper component, in the order of step 1. Each render gets its own Apollo client and cache. (from 4.3)
+- During server rendering, `useQuery` sends no request: Apollo Client 4 subscribes to a query only in the browser, so the server renders the loading state (`useQuery.js`, `useSyncExternalStore` server snapshot). (from 4.3)
 
 ## 5.1
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
 - `reportError(error, { operationName })` in `src/server/graphql.ts` gets the original error of a resolver, and also a failed context (for example, the database is down) with `operationName: null`. Apollo does not log these errors, so until Sentry is connected they appear only in the responses. (from 2.5)
+- `reportClientError(error: unknown, { operationName })` is in `apps/web/src/lib/monitoring/report-client-error.ts`, not in `error-link.ts` (owner's choice in 4.3): connect Sentry there. `error-link.test.ts` mocks that module, so test the Sentry call in its own test. `operationName` is `undefined` for an anonymous operation. (from 4.3)
 
 ## 5.4
 
