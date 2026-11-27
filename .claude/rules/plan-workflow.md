@@ -8,9 +8,10 @@ These rules add to `CLAUDE.md` and `docs/plan/README.md`.
 - Before that commit, set the task's `- Review:` line in `docs/ai-log.md` to `approved, no changes.`. If the owner changed something in review, list the changes instead.
 - Put the Review line in the same commit as the task. Review lines of earlier tasks that the owner changed but did not commit go into the same commit too.
 
-## AI log
+## Notes for later tasks
 
-- Write a note for a later task in the `Deviations` of the current task's entry in `docs/ai-log.md`.
-- Do not create a separate notes file for it, and do not change `docs/plan/` for it.
-- Reason: the agent of the later task finds a problem that fails loudly (an error or a failing check) by itself, so the log is enough.
-- If a problem would fail silently in the later task, tell the owner. The owner decides where the note goes.
+- Write a note for a later task in `.claude/NOTES.md`, under a heading with that task's ID (`## 4.4`). Add `(from <current task ID>)` at the end of the note.
+- A note that applies to no single task goes under `## General tips`, the first group.
+- If the group exists, add the note to it. Keep the task groups in task order.
+- Do not delete notes, also after their task is done.
+- `docs/ai-log.md` only records the work. Do not write notes for later tasks there, and do not change `docs/plan/` for them.

@@ -4,7 +4,7 @@ ModQueue is a keyboard-first console for community moderators. A moderator works
 
 ## Working rules
 
-Plan: `docs/plan/README.md`. Read it and `docs/plan/conventions.md` first. One task per session. Log in `docs/ai-log.md`. Never commit, push, merge, create branches or delete files without the owner's approval.
+Plan: `docs/plan/README.md`. Read it and `docs/plan/conventions.md` first. Before you start a task, always read its notes in `.claude/NOTES.md` (the heading is the task ID) and the "General tips" group there. One task per session. Log in `docs/ai-log.md`. Never commit, push, merge, create branches or delete files without the owner's approval.
 
 ## Commands
 
