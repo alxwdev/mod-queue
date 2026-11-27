@@ -26,7 +26,7 @@ type SheetProps = Pick<
   ComponentProps<typeof DialogPrimitive.Root>,
   'open' | 'defaultOpen' | 'onOpenChange'
 > &
-  Pick<ComponentProps<typeof DialogPrimitive.Content>, 'children'> &
+  Pick<ComponentProps<typeof DialogPrimitive.Content>, 'children' | 'onOpenAutoFocus'> &
   VariantProps<typeof sheetVariants> & {
     /** The visible heading; it is also the accessible name of the sheet. */
     title: ReactNode;
@@ -51,6 +51,7 @@ export function Sheet({
   trigger,
   footer,
   'data-hotkeys-scope': hotkeysScope,
+  onOpenAutoFocus,
   children,
 }: SheetProps) {
   return (
@@ -60,6 +61,7 @@ export function Sheet({
         <DialogPrimitive.Overlay className={overlayClassName} />
         <DialogPrimitive.Content
           data-hotkeys-scope={hotkeysScope}
+          onOpenAutoFocus={onOpenAutoFocus}
           className={sheetVariants({ side })}
         >
           <div className={dialogLayout.header}>

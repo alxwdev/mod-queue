@@ -21,6 +21,11 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - Codegen leaves out `apps/web/src/**/*.test.{ts,tsx}` (owner's choice in 4.3). A test that needs its own GraphQL document writes it with `gql` from `@apollo/client` and a hand-written `TypedDocumentNode` type; a feature test imports the feature's documents. (from 4.3)
 - The codegen watcher of `pnpm dev` does not reload `codegen.ts`: after a change to it, restart `pnpm dev`, or the watcher keeps writing the old output into `apps/web/src/gql/`. (from 4.3)
 - An MSW `graphql.query()` resolver must return a GraphQL body (TypeScript checks it). For a response that is not GraphQL, such as a 502 with text, use `http.post('/api/graphql', …)`. (from 4.3)
+- `renderWithProviders` wraps the UI in `Providers` of `app/providers.tsx` (Apollo, Settings, Announcer, Toast, Tooltip): a test needs no `TooltipProvider` or `ToastProvider` of its own. Jest runs no App Router, so `usePathname()` returns `null`: a test of a component that uses it mocks it, as `app-shell.test.tsx` does (`jest.mock('next/navigation', () => ({ usePathname: () => window.location.pathname }))`). (from 4.4)
+- A test that renders `AppShell` or `ModeratorSwitcher` sends the `ModeratorSwitcher` query: add an MSW handler for it (`app-shell.test.tsx` has one). (from 4.4)
+- After `client.resetStore()`, the `data` of `useQuery` is `undefined` until the refetch returns. A control that keeps the focus (a menu trigger) must render from `data ?? previousData`, or it unmounts and the focus falls to `body`. (from 4.4)
+- `useAnnounce()` of `components/feedback/announcer.tsx` returns `announce(message, 'polite' | 'assertive')`; a second message in the same frame replaces the first. The regions have an explicit `aria-live`, so they are read also while a Radix dialog or sheet is open. (from 4.4)
+- With a `DropdownMenu` open, axe's best-practice rule `region` flags the Radix popper wrapper, which is outside the landmarks; the WCAG tags pass. `AxeBuilder` runs the best-practice rules by default: an E2E axe check with an open menu needs `.withTags([...])` or `.disableRules(['region'])`. (from 4.4)
 
 ## 2.4
 
@@ -75,10 +80,12 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
 - `reportError(error, { operationName })` in `src/server/graphql.ts` gets the original error of a resolver, and also a failed context (for example, the database is down) with `operationName: null`. Apollo does not log these errors, so until Sentry is connected they appear only in the responses. (from 2.5)
 - `reportClientError(error: unknown, { operationName })` is in `apps/web/src/lib/monitoring/report-client-error.ts`, not in `error-link.ts` (owner's choice in 4.3): connect Sentry there. `error-link.test.ts` mocks that module, so test the Sentry call in its own test. `operationName` is `undefined` for an anonymous operation. (from 4.3)
+- The three error boundaries (`app/error.tsx`, `app/(console)/error.tsx`, `app/global-error.tsx`) call `reportClientError(error, { operationName: undefined })`: Sentry in `report-client-error.ts` covers them too. (from 4.4)
 
 ## 5.4
 
 - Queue rows set the focus ring offset to `-2px` (`design.md`): add `-outline-offset-2` to the row. The global `:focus-visible` rule in `globals.css` gives the rest of the ring. (from 4.1)
+- The shell is an app frame (owner's choice in 4.4): `main#main` (`overflow-y-auto`, `p-4 md:p-6`) is the only scroll container of the page and has a fixed height. The queue screen fills it with `h-full`; its list and preview scroll inside. (from 4.4)
 
 ## 6.1
 
@@ -88,6 +95,7 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - Radix's focus trap in `Sheet` skips a scroll container without focusable content: if the body holds only text, the keyboard cannot scroll it, and axe in the browser reports `scrollable-region-focusable` (owner's choice in 4.2: `Sheet` stays as it is). If the ItemSheet body can hold only text, give the body `tabIndex={0}` and a name (a new `Sheet` prop), or make sure the body has a control. (from 4.2)
 - `Sheet` passes no `onOpenAutoFocus` or `onCloseAutoFocus` yet. To focus the sheet title on open, add `onOpenAutoFocus` to `Sheet` (prevent the default, then focus the title; the title needs `tabIndex={-1}`). (from 4.2)
+- `Sheet` now passes `onOpenAutoFocus` (added in 4.4 for the menu sheet: Radix skips links when it focuses the first control on open). (from 4.4)
 
 ## 6.4
 
@@ -97,6 +105,15 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - `approveContent`, `removeContent` and `banAuthor` return the `results` in the order of the input ids. The `content` of a result is `null` only for `NOT_FOUND`; `handledBy` can also be `null` for `ALREADY_HANDLED` (an item without a non-undone action). (from 3.2)
 - `undoModeration` gives `NOT_FOUND` for a batch that is already undone, also when a parallel undo of the same batch won: handle it like `UNDO_EXPIRED` and `FORBIDDEN`. `restored` has no defined order and holds only the items that still had the status that the batch set. (from 3.2)
+
+## 7.4
+
+- `useSettings()` of `features/settings/use-settings.ts` returns `{ shortcutsEnabled, theme, updateSettings(patch) }`; the settings are saved in localStorage under `modqueue:settings`. (from 4.4)
+
+## 7.5
+
+- `SettingsMenu` is a `DropdownMenu` with one `DropdownMenuCheckboxItem` "Single-key shortcuts" (owner's choice in 4.4); add the item that opens the dialog there. The item closes the menu when it is selected (Radix default). (from 4.4)
+- At 320 px the header has about 10 px free. A header button "Keyboard shortcuts" next to the switcher must be an `IconButton` (32 px), and the switcher then cuts "mod_aurora" with an ellipsis; check the header at 320 px. (from 4.4)
 
 ## 9.1
 
@@ -120,6 +137,10 @@ What a later task must know or do. Each heading is the ID of the task that its n
 ## 10.2
 
 - `reportsPerHour(hours)` returns exactly `hours` UTC buckets, oldest first; the last bucket is the current hour and is incomplete, so a lower last value is not a drop. `medianTimeToAction(days)` returns exactly `days` UTC days that end with today (also incomplete); `topReasons(days)` counts the same days. The API clamps `hours` to 1..168, `days` to 1..30 and `limit` to 1..10. Each `QueueHealth` field is a field resolver, so a query for `summary` alone runs no chart queries. (from 3.5)
+
+## 10.3
+
+- `main-nav.tsx` renders each link as icon + label: the badge goes after the label (`ml-auto` puts it at the right edge of the sidebar). `MainNav` renders twice: in the bar and sidebar (`variant="shell"`) and in the phone menu sheet (`variant="sheet"`), so the badge shows in both. (from 4.4)
 
 ## 10.4
 

@@ -15,8 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { ToastProvider } from '@/components/ui/toast';
-import { Tooltip, TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip } from '@/components/ui/tooltip';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { CssVariableValue } from './css-variable-value';
 import {
@@ -269,248 +268,244 @@ export default function DevUiPage() {
         </section>
       </section>
 
-      <TooltipProvider>
-        <section aria-labelledby="components" className="space-y-8">
-          <h2 id="components" className="text-lg font-semibold">
-            Components
-          </h2>
+      <section aria-labelledby="components" className="space-y-8">
+        <h2 id="components" className="text-lg font-semibold">
+          Components
+        </h2>
 
-          <ComponentSection id="button" title="Button">
-            {sizes.map((size) => (
-              <Example key={size} label={`Size ${size}`}>
-                {buttonVariantNames.map((variant) => (
-                  <Button key={variant} variant={variant} size={size}>
-                    {variant}
-                  </Button>
-                ))}
-              </Example>
-            ))}
-            <Example label="With an icon">
-              <Button variant="primary">
-                <Check />
-                Approve
-              </Button>
-              <Button variant="danger" size="lg">
-                <Trash2 />
-                Remove
-              </Button>
-            </Example>
-            <Example label="Disabled">
+        <ComponentSection id="button" title="Button">
+          {sizes.map((size) => (
+            <Example key={size} label={`Size ${size}`}>
               {buttonVariantNames.map((variant) => (
-                <Button key={variant} variant={variant} disabled>
+                <Button key={variant} variant={variant} size={size}>
                   {variant}
                 </Button>
               ))}
             </Example>
-            <Example label="Loading (keeps its width, aria-busy)">
-              {buttonVariantNames.map((variant) => (
-                <Button key={variant} variant={variant} loading>
-                  {variant}
-                </Button>
-              ))}
-            </Example>
-          </ComponentSection>
-
-          <ComponentSection id="icon-button" title="IconButton">
-            {sizes.map((size) => (
-              <Example key={size} label={`Size ${size}; hover or focus shows the label`}>
-                <IconButton label="Close" variant="ghost" size={size}>
-                  <X />
-                </IconButton>
-                <IconButton label="Undo" size={size}>
-                  <Undo2 />
-                </IconButton>
-                <IconButton label="Settings" variant="primary" size={size}>
-                  <Settings />
-                </IconButton>
-                <IconButton label="Remove" variant="danger" size={size}>
-                  <Trash2 />
-                </IconButton>
-              </Example>
+          ))}
+          <Example label="With an icon">
+            <Button variant="primary">
+              <Check />
+              Approve
+            </Button>
+            <Button variant="danger" size="lg">
+              <Trash2 />
+              Remove
+            </Button>
+          </Example>
+          <Example label="Disabled">
+            {buttonVariantNames.map((variant) => (
+              <Button key={variant} variant={variant} disabled>
+                {variant}
+              </Button>
             ))}
-            <Example label="Disabled and loading">
-              <IconButton label="Undo (disabled)" disabled>
+          </Example>
+          <Example label="Loading (keeps its width, aria-busy)">
+            {buttonVariantNames.map((variant) => (
+              <Button key={variant} variant={variant} loading>
+                {variant}
+              </Button>
+            ))}
+          </Example>
+        </ComponentSection>
+
+        <ComponentSection id="icon-button" title="IconButton">
+          {sizes.map((size) => (
+            <Example key={size} label={`Size ${size}; hover or focus shows the label`}>
+              <IconButton label="Close" variant="ghost" size={size}>
+                <X />
+              </IconButton>
+              <IconButton label="Undo" size={size}>
                 <Undo2 />
               </IconButton>
-              <IconButton label="Remove (loading)" variant="danger" loading>
+              <IconButton label="Settings" variant="primary" size={size}>
+                <Settings />
+              </IconButton>
+              <IconButton label="Remove" variant="danger" size={size}>
                 <Trash2 />
               </IconButton>
             </Example>
-          </ComponentSection>
+          ))}
+          <Example label="Disabled and loading">
+            <IconButton label="Undo (disabled)" disabled>
+              <Undo2 />
+            </IconButton>
+            <IconButton label="Remove (loading)" variant="danger" loading>
+              <Trash2 />
+            </IconButton>
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="kbd" title="Kbd">
-            <p className="text-sm">
-              Press <Kbd>J</Kbd> or <Kbd>K</Kbd> to move, <Kbd>?</Kbd> for help, <Kbd>Ctrl</Kbd> +{' '}
-              <Kbd>Enter</Kbd> to submit.
-            </p>
-          </ComponentSection>
+        <ComponentSection id="kbd" title="Kbd">
+          <p className="text-sm">
+            Press <Kbd>J</Kbd> or <Kbd>K</Kbd> to move, <Kbd>?</Kbd> for help, <Kbd>Ctrl</Kbd> +{' '}
+            <Kbd>Enter</Kbd> to submit.
+          </p>
+        </ComponentSection>
 
-          <ComponentSection id="badge" title="Badge">
-            <Example label="Variants">
-              {badgeVariantNames.map((variant) => (
-                <Badge key={variant} variant={variant}>
-                  {variant}
-                </Badge>
-              ))}
-            </Example>
-          </ComponentSection>
+        <ComponentSection id="badge" title="Badge">
+          <Example label="Variants">
+            {badgeVariantNames.map((variant) => (
+              <Badge key={variant} variant={variant}>
+                {variant}
+              </Badge>
+            ))}
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="checkbox" title="Checkbox">
-            <div className="flex flex-col gap-3">
-              <Checkbox label="Unchecked" />
-              <Checkbox label="Checked" defaultChecked />
-              <Checkbox label="Indeterminate" checked="indeterminate" />
-              <Checkbox label="Disabled" disabled />
-              <Checkbox label="Disabled and checked" disabled defaultChecked />
+        <ComponentSection id="checkbox" title="Checkbox">
+          <div className="flex flex-col gap-3">
+            <Checkbox label="Unchecked" />
+            <Checkbox label="Checked" defaultChecked />
+            <Checkbox label="Indeterminate" checked="indeterminate" />
+            <Checkbox label="Disabled" disabled />
+            <Checkbox label="Disabled and checked" disabled defaultChecked />
+          </div>
+        </ComponentSection>
+
+        <ComponentSection id="switch" title="Switch">
+          <div className="flex max-w-sm flex-col gap-4">
+            <Switch
+              label="Single-key shortcuts"
+              description="J, K, A, R, B, Z and ? work without a modifier key."
+            />
+            <Switch label="On" defaultChecked />
+            <Switch label="Disabled" disabled />
+            <Switch label="Disabled and on" disabled defaultChecked />
+          </div>
+        </ComponentSection>
+
+        <ComponentSection id="radio-group" title="RadioGroup">
+          <RadioGroup label="Sort" description="The order of the queue." defaultValue="oldest">
+            <RadioGroupItem value="oldest" label="Oldest first" />
+            <RadioGroupItem value="newest" label="Newest first" />
+            <RadioGroupItem
+              value="reports"
+              label="Most reports"
+              description="Equal counts: oldest first."
+            />
+            <RadioGroupItem value="score" label="Disabled" disabled />
+          </RadioGroup>
+        </ComponentSection>
+
+        <ComponentSection id="tooltip" title="Tooltip">
+          <Example label="Opens after 400 ms on hover, at once on keyboard focus">
+            <Tooltip content="Approves the current item">
+              <Button>Hover or focus me</Button>
+            </Tooltip>
+          </Example>
+        </ComponentSection>
+
+        <ComponentSection id="field" title="Field, Input, Textarea, Select">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Title">
+              <Input placeholder="Spam or scam" />
+            </Field>
+            <Field label="Title" description="Shown in the remove dialog.">
+              <Input defaultValue="Spam" />
+            </Field>
+            <Field label="Title" error="Enter a title.">
+              <Input />
+            </Field>
+            <Field label="Title (disabled)">
+              <Input defaultValue="Spam" disabled />
+            </Field>
+            <Field
+              label="Message to the user"
+              description="Placeholders: {{username}}, {{community}}."
+            >
+              <Textarea placeholder="Hi {{username}}, …" />
+            </Field>
+            <Field label="Message to the user" error="Use at most 1,000 characters.">
+              <Textarea defaultValue="Hi {{username}}," />
+            </Field>
+            <Field label="Ban duration">
+              <Select defaultValue="7">
+                <option value="1">1 day</option>
+                <option value="7">7 days</option>
+                <option value="30">30 days</option>
+                <option value="permanent">Permanent</option>
+              </Select>
+            </Field>
+            <Field label="Ban duration" error="Choose a duration.">
+              <Select defaultValue="">
+                <option value="">Choose…</option>
+                <option value="1">1 day</option>
+              </Select>
+            </Field>
+            <Field label="Ban duration (disabled)">
+              <Select disabled>
+                <option>7 days</option>
+              </Select>
+            </Field>
+          </div>
+        </ComponentSection>
+
+        <ComponentSection id="skeleton" title="Skeleton">
+          <div className="flex gap-3">
+            <Skeleton className="size-10" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
             </div>
-          </ComponentSection>
+          </div>
+        </ComponentSection>
 
-          <ComponentSection id="switch" title="Switch">
-            <div className="flex max-w-sm flex-col gap-4">
-              <Switch
-                label="Single-key shortcuts"
-                description="J, K, A, R, B, Z and ? work without a modifier key."
-              />
-              <Switch label="On" defaultChecked />
-              <Switch label="Disabled" disabled />
-              <Switch label="Disabled and on" disabled defaultChecked />
-            </div>
-          </ComponentSection>
+        <ComponentSection id="spinner" title="Spinner">
+          <Example label="Default label and a custom label">
+            <Spinner />
+            <Spinner label="Loading the queue" />
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="radio-group" title="RadioGroup">
-            <RadioGroup label="Sort" description="The order of the queue." defaultValue="oldest">
-              <RadioGroupItem value="oldest" label="Oldest first" />
-              <RadioGroupItem value="newest" label="Newest first" />
-              <RadioGroupItem
-                value="reports"
-                label="Most reports"
-                description="Equal counts: oldest first."
-              />
-              <RadioGroupItem value="score" label="Disabled" disabled />
-            </RadioGroup>
-          </ComponentSection>
+        <ComponentSection id="visually-hidden" title="VisuallyHidden">
+          <Example label="The button's name is visually hidden text">
+            <button
+              type="button"
+              className="inline-flex size-9 items-center justify-center rounded-md text-fg-muted hover:bg-canvas"
+            >
+              <X className="size-4" />
+              <VisuallyHidden>Close</VisuallyHidden>
+            </button>
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="tooltip" title="Tooltip">
-            <Example label="Opens after 400 ms on hover, at once on keyboard focus">
-              <Tooltip content="Approves the current item">
-                <Button>Hover or focus me</Button>
-              </Tooltip>
-            </Example>
-          </ComponentSection>
+        <ComponentSection id="dialog" title="Dialog">
+          <Example label="Sizes sm, md and lg from md; the whole screen below md">
+            <DialogExample size="sm" />
+            <DialogExample size="md" />
+            <DialogExample size="lg" />
+          </Example>
+          <Example label="Long content: only the body scrolls">
+            <DialogExample size="md" long />
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="field" title="Field, Input, Textarea, Select">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Title">
-                <Input placeholder="Spam or scam" />
-              </Field>
-              <Field label="Title" description="Shown in the remove dialog.">
-                <Input defaultValue="Spam" />
-              </Field>
-              <Field label="Title" error="Enter a title.">
-                <Input />
-              </Field>
-              <Field label="Title (disabled)">
-                <Input defaultValue="Spam" disabled />
-              </Field>
-              <Field
-                label="Message to the user"
-                description="Placeholders: {{username}}, {{community}}."
-              >
-                <Textarea placeholder="Hi {{username}}, …" />
-              </Field>
-              <Field label="Message to the user" error="Use at most 1,000 characters.">
-                <Textarea defaultValue="Hi {{username}}," />
-              </Field>
-              <Field label="Ban duration">
-                <Select defaultValue="7">
-                  <option value="1">1 day</option>
-                  <option value="7">7 days</option>
-                  <option value="30">30 days</option>
-                  <option value="permanent">Permanent</option>
-                </Select>
-              </Field>
-              <Field label="Ban duration" error="Choose a duration.">
-                <Select defaultValue="">
-                  <option value="">Choose…</option>
-                  <option value="1">1 day</option>
-                </Select>
-              </Field>
-              <Field label="Ban duration (disabled)">
-                <Select disabled>
-                  <option>7 days</option>
-                </Select>
-              </Field>
-            </div>
-          </ComponentSection>
+        <ComponentSection id="alert-dialog" title="AlertDialog">
+          <Example label="Opens with the focus on Cancel; a click outside does not close it">
+            <AlertDialogExample />
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="skeleton" title="Skeleton">
-            <div className="flex gap-3">
-              <Skeleton className="size-10" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            </div>
-          </ComponentSection>
+        <ComponentSection id="sheet" title="Sheet">
+          <Example label='side="right" for tablet, side="full" for phone; data-hotkeys-scope="queue"'>
+            <SheetExample side="right" />
+            <SheetExample side="full" />
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="spinner" title="Spinner">
-            <Example label="Default label and a custom label">
-              <Spinner />
-              <Spinner label="Loading the queue" />
-            </Example>
-          </ComponentSection>
+        <ComponentSection id="dropdown-menu" title="DropdownMenu">
+          <Example label="Items, checkbox items, a radio group, labels and separators">
+            <DropdownMenuExample />
+          </Example>
+        </ComponentSection>
 
-          <ComponentSection id="visually-hidden" title="VisuallyHidden">
-            <Example label="The button's name is visually hidden text">
-              <button
-                type="button"
-                className="inline-flex size-9 items-center justify-center rounded-md text-fg-muted hover:bg-canvas"
-              >
-                <X className="size-4" />
-                <VisuallyHidden>Close</VisuallyHidden>
-              </button>
-            </Example>
-          </ComponentSection>
-
-          <ComponentSection id="dialog" title="Dialog">
-            <Example label="Sizes sm, md and lg from md; the whole screen below md">
-              <DialogExample size="sm" />
-              <DialogExample size="md" />
-              <DialogExample size="lg" />
-            </Example>
-            <Example label="Long content: only the body scrolls">
-              <DialogExample size="md" long />
-            </Example>
-          </ComponentSection>
-
-          <ComponentSection id="alert-dialog" title="AlertDialog">
-            <Example label="Opens with the focus on Cancel; a click outside does not close it">
-              <AlertDialogExample />
-            </Example>
-          </ComponentSection>
-
-          <ComponentSection id="sheet" title="Sheet">
-            <Example label='side="right" for tablet, side="full" for phone; data-hotkeys-scope="queue"'>
-              <SheetExample side="right" />
-              <SheetExample side="full" />
-            </Example>
-          </ComponentSection>
-
-          <ComponentSection id="dropdown-menu" title="DropdownMenu">
-            <Example label="Items, checkbox items, a radio group, labels and separators">
-              <DropdownMenuExample />
-            </Example>
-          </ComponentSection>
-
-          <ComponentSection id="toast" title="Toast">
-            <Example label="Bottom right from md, above the bottom bar below md; F8 moves the focus to the toasts">
-              <ToastProvider>
-                <ToastExamples />
-              </ToastProvider>
-            </Example>
-          </ComponentSection>
-        </section>
-      </TooltipProvider>
+        <ComponentSection id="toast" title="Toast">
+          <Example label="Bottom right from md, above the bottom bar below md; F8 moves the focus to the toasts">
+            <ToastExamples />
+          </Example>
+        </ComponentSection>
+      </section>
     </main>
   );
 }
