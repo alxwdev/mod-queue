@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push to the same pull request or branch cancels the run that is still going.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: modqueue
+          POSTGRES_PASSWORD: modqueue
+          POSTGRES_DB: modqueue
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U modqueue -d modqueue"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@v7
+      # The pnpm version comes from the packageManager field of package.json.
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Create the test database
+        run: psql postgresql://modqueue:modqueue@localhost:5432/modqueue -c 'CREATE DATABASE modqueue_test'
+      - run: pnpm test:coverage
+        env:
+          DATABASE_URL_TEST: postgresql://modqueue:modqueue@localhost:5432/modqueue_test
+      - name: Upload the coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: |
+            apps/web/coverage
+            packages/*/coverage
+
+  e2e:
+    needs: quality
+    runs-on: ubuntu-latest
+    services:
+      # apps/web/e2e/global-setup.ts connects with these credentials on localhost:5432.
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: modqueue
+          POSTGRES_PASSWORD: modqueue
+          POSTGRES_DB: modqueue
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U modqueue -d modqueue"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@v7
+      # The pnpm version comes from the packageManager field of package.json.
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Create the E2E database
+        run: psql postgresql://modqueue:modqueue@localhost:5432/modqueue -c 'CREATE DATABASE modqueue_e2e'
+      - name: Read the Playwright version
+        id: playwright
+        working-directory: apps/web
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache the Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      # Runs on a cache hit too: the cache holds the browsers, not the system libraries they need.
+      - name: Install Chromium
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - run: pnpm test:e2e
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report

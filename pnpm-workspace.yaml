@@ -10,9 +10,14 @@ peerDependencyRules:
 # None of these build scripts is needed: the Prisma CLI downloads its schema engine on first use;
 # esbuild (used by tsx), @swc/core and @parcel/watcher (used by Jest) load their prebuilt platform
 # packages, and their scripts only check for them or build from source when they are missing.
+# The msw script only copies the browser worker for `msw.workerDirectory`; the tests use msw/node.
+# The @apollo/protobufjs script (via @apollo/server) only creates a folder for the protobufjs CLI
+# and checks the version scheme of its parent package.
 ignoredBuiltDependencies:
+  - '@apollo/protobufjs'
   - '@parcel/watcher'
   - '@prisma/engines'
   - '@swc/core'
   - esbuild
+  - msw
   - prisma
