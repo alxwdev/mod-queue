@@ -14,6 +14,9 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - The focus ring is one global `:focus-visible` rule in `globals.css` (2 px `--focus` outline, offset 2 px). Components add no outline classes; an element that needs another offset overrides it with a utility (`-outline-offset-2`). (from 4.1)
 - In Jest, a Radix RadioGroup selects an item on an arrow key only while the key is down, and Radix moves the focus in a timeout: `user.keyboard('{ArrowDown}')` moves the focus but selects nothing. Hold the key: `await user.keyboard('{ArrowDown>}')`, then `await user.keyboard('{/ArrowDown}')`. (from 4.1)
 - Every `Tooltip` and `IconButton` needs a `TooltipProvider` (`components/ui/tooltip.tsx`, 400 ms delay) above it, or Radix throws. Until `renderWithProviders` has it (task 4.4), render with `{ wrapper: TooltipProvider }`. (from 4.1)
+- `Dialog` and `Sheet` have an `IconButton` (Close), so they need a `TooltipProvider` too. `ToastProvider` brings its own for the Close buttons of the toasts. (from 4.2)
+- In Jest, while a Radix `Dialog`, `AlertDialog` or `Sheet` is open, Radix sets `aria-hidden` on the rest of the page: `getByRole` finds an element there only with `{ hidden: true }`. After a close, Radix moves the focus in a timeout: check a focus that `onCloseAutoFocus` sets inside `waitFor`. (from 4.2)
+- Radix Toast checks `event.code` for its `F8` key, and `user.keyboard('{F8}')` sends no code: press `user.keyboard('[F8]')`. Radix writes the text of a toast announcement (`role="status"`) on the next frame: check it inside `waitFor`. (from 4.2)
 
 ## 2.4
 
@@ -58,6 +61,8 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - The four stub pages in `apps/web/src/app/(console)/` wrap their `<h1>` in `<main>`, so the axe checks find a main landmark. Remove these `<main>` elements when `AppShell` adds `main#main`. (from 1.3)
 - The API compares the value of the cookie `mq_moderator` as it is, without URL decoding: write the plain username. The header `x-moderator` wins over the cookie, so the app must not send that header. (from 2.5)
 - `/dev/ui` wraps its "Components" section in its own `TooltipProvider`. When `providers.tsx` adds the Tooltip provider to the root layout, remove that wrapper from `app/dev/ui/page.tsx`. (from 4.1)
+- `/dev/ui` wraps its Toast example in its own `ToastProvider`. When `providers.tsx` adds the Toast provider, remove that wrapper from `app/dev/ui/page.tsx`. (from 4.2)
+- The menu sheet: `Sheet` takes `title` (required), `description`, `side` (`"right"` or `"full"`), `trigger`, `footer`, `open`/`onOpenChange` and `data-hotkeys-scope`. On open, Radix focuses the first control of the body; Close is the last control. (from 4.2)
 
 ## 5.1
 
@@ -67,6 +72,15 @@ What a later task must know or do. Each heading is the ID of the task that its n
 ## 5.4
 
 - Queue rows set the focus ring offset to `-2px` (`design.md`): add `-outline-offset-2` to the row. The global `:focus-visible` rule in `globals.css` gives the rest of the ring. (from 4.1)
+
+## 6.1
+
+- A `DropdownMenuCheckboxItem` closes the menu when it is selected (Radix default). To keep a filter menu open for several choices, call `event.preventDefault()` in its `onSelect`. `DropdownMenu` is not modal (owner's choice in 4.2): a click outside closes the menu and also reaches the control under the pointer. (from 4.2)
+
+## 6.2
+
+- Radix's focus trap in `Sheet` skips a scroll container without focusable content: if the body holds only text, the keyboard cannot scroll it, and axe in the browser reports `scrollable-region-focusable` (owner's choice in 4.2: `Sheet` stays as it is). If the ItemSheet body can hold only text, give the body `tabIndex={0}` and a name (a new `Sheet` prop), or make sure the body has a control. (from 4.2)
+- `Sheet` passes no `onOpenAutoFocus` or `onCloseAutoFocus` yet. To focus the sheet title on open, add `onOpenAutoFocus` to `Sheet` (prevent the default, then focus the title; the title needs `tabIndex={-1}`). (from 4.2)
 
 ## 6.4
 
@@ -84,10 +98,12 @@ What a later task must know or do. Each heading is the ID of the task that its n
 ## 9.2
 
 - `message-preview.tsx`: fill `{{duration}}` with `formatBanDuration(durationDays)` of `@modqueue/shared` only in ban mode, as the API does. In remove mode the API leaves `{{duration}}` as it is. `{{community}}` is the community name, `{{reason}}` the title of the removal reason. (from 3.2)
+- `Dialog` renders `footer` outside its `children`: a submit button in the footer needs `form={formId}` of the form in the body. `Dialog` passes `onCloseAutoFocus` through, so `focusAfterDialog` runs there after `event.preventDefault()`. On open, Radix focuses the first control of the body; the Close button is the last control. (from 4.2)
 
 ## 9.3
 
 - `removalReasonSchema` trims `title` and `messageTemplate`, so its input and output types differ: with `zodResolver`, send the parsed (trimmed) values. The API returns `fieldErrors` with the keys `title` and `messageTemplate`: map them to the form fields with `setError`. `updateRemovalReason` and `archiveRemovalReason` give `NOT_FOUND` for an unknown id; archiving an archived reason returns it unchanged. New reasons go to the end of the list (highest `sortOrder` + 1). (from 3.3)
+- `AlertDialog` takes `confirmLabel`, `confirmVariant` (`"danger"` for archive) and `onConfirm`; Cancel is built in. The confirm button always closes the dialog, so an archive error must show as a toast. (from 4.2)
 
 ## 10.1
 

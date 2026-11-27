@@ -15,9 +15,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { ToastProvider } from '@/components/ui/toast';
 import { Tooltip, TooltipProvider } from '@/components/ui/tooltip';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { CssVariableValue } from './css-variable-value';
+import {
+  AlertDialogExample,
+  DialogExample,
+  DropdownMenuExample,
+  SheetExample,
+  ToastExamples,
+} from './overlay-examples';
 
 export const metadata: Metadata = {
   title: 'UI showcase · ModQueue',
@@ -461,6 +469,44 @@ export default function DevUiPage() {
                 <X className="size-4" />
                 <VisuallyHidden>Close</VisuallyHidden>
               </button>
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="dialog" title="Dialog">
+            <Example label="Sizes sm, md and lg from md; the whole screen below md">
+              <DialogExample size="sm" />
+              <DialogExample size="md" />
+              <DialogExample size="lg" />
+            </Example>
+            <Example label="Long content: only the body scrolls">
+              <DialogExample size="md" long />
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="alert-dialog" title="AlertDialog">
+            <Example label="Opens with the focus on Cancel; a click outside does not close it">
+              <AlertDialogExample />
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="sheet" title="Sheet">
+            <Example label='side="right" for tablet, side="full" for phone; data-hotkeys-scope="queue"'>
+              <SheetExample side="right" />
+              <SheetExample side="full" />
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="dropdown-menu" title="DropdownMenu">
+            <Example label="Items, checkbox items, a radio group, labels and separators">
+              <DropdownMenuExample />
+            </Example>
+          </ComponentSection>
+
+          <ComponentSection id="toast" title="Toast">
+            <Example label="Bottom right from md, above the bottom bar below md; F8 moves the focus to the toasts">
+              <ToastProvider>
+                <ToastExamples />
+              </ToastProvider>
             </Example>
           </ComponentSection>
         </section>

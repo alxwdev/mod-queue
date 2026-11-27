@@ -46,6 +46,11 @@ describe('DevUiPage', () => {
       'Skeleton',
       'Spinner',
       'VisuallyHidden',
+      'Dialog',
+      'AlertDialog',
+      'Sheet',
+      'DropdownMenu',
+      'Toast',
     ]) {
       expect(screen.getByRole('heading', { level: 3, name })).toBeInTheDocument();
     }
