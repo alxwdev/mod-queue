@@ -26,6 +26,9 @@ What a later task must know or do. Each heading is the ID of the task that its n
 - After `client.resetStore()`, the `data` of `useQuery` is `undefined` until the refetch returns. A control that keeps the focus (a menu trigger) must render from `data ?? previousData`, or it unmounts and the focus falls to `body`. (from 4.4)
 - `useAnnounce()` of `components/feedback/announcer.tsx` returns `announce(message, 'polite' | 'assertive')`; a second message in the same frame replaces the first. The regions have an explicit `aria-live`, so they are read also while a Radix dialog or sheet is open. (from 4.4)
 - With a `DropdownMenu` open, axe's best-practice rule `region` flags the Radix popper wrapper, which is outside the landmarks; the WCAG tags pass. `AxeBuilder` runs the best-practice rules by default: an E2E axe check with an open menu needs `.withTags([...])` or `.disableRules(['region'])`. (from 4.4)
+- `next build` uses Turbopack, and Sentry wraps route handlers only in webpack builds. An error that a route handler throws reaches Sentry through `onRequestError` in `src/instrumentation.ts`, which waits for the send. A route handler that calls `captureException` by hand must also call `after(() => flush(2000))` (`after` from `next/server`), as `src/server/graphql.ts` does; else Vercel can freeze the function before the event is sent. (from 5.1)
+- Report unexpected errors with `reportClientError` (browser) or through `reportError` of `src/server/graphql.ts`; both tag the event with `graphql.operation` when there is an operation name. `@sentry/nextjs` loads in Jest without a mock and sends nothing (no DSN); to check a Sentry call, mock it with a factory, as `report-client-error.test.ts` does. (from 5.1)
+- In development, React StrictMode runs effects twice, and `useReportWebVitals` cannot unsubscribe: `WebVitalsReporter` gets each Web Vitals metric twice (two `console.table` pairs, two items in `window.__MODQUEUE_VITALS__`). A production build (`pnpm build`, the E2E tests) reports each metric once. (from 5.1)
 
 ## 2.4
 
@@ -146,7 +149,15 @@ What a later task must know or do. Each heading is the ID of the task that its n
 
 - `route.test.ts`: mock `@modqueue/api` with a factory (`jest.mock('@modqueue/api', () => ({ … }))`). A plain import, `jest.mock` without a factory (automock) or `jest.requireActual` loads the real package. Its seed imports faker 10, which ships only ES modules, and the web test fails with "Must use import to load ES Module: …@faker-js/faker…". If a test needs the real package, add `@faker-js/faker` to `esmPackages` in `apps/web/jest.config.ts`. Checked with throwaway web Jest tests on 2026-11-26. (from 1.6)
 
+## 11.3
+
+- `next.config.ts` exports `withSentryConfig(nextConfig, …)`: wrap the bundle analyzer inside it, `withSentryConfig(withBundleAnalyzer(nextConfig), …)`. The browser SDK (`src/instrumentation-client.ts`) has `browserTracingIntegration` and no Replay, and it is part of the first-load JS of every page. (from 5.1)
+
 ## 11.4
 
 - Coverage thresholds apply only when `COVERAGE_THRESHOLDS=1` (all three Jest configs). Set it for `pnpm test:coverage` in CI. (from 1.5, 2.1)
 - An enforced run fails when a threshold path matches no files ("Coverage data for ./src/\*\*/hooks/\*\* was not found"). In `apps/web`, a glob threshold applies to each matching file. (from 1.5, 2.1)
+
+## 12.2
+
+- Sentry gets the Web Vitals only as measurements of the sampled page loads (`tracesSampleRate` 0.2 in production), so a few visits may show none. An ad blocker in the checking browser can block the requests to `*.ingest.sentry.io`: check with it turned off. (from 5.1)

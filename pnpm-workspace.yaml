@@ -13,10 +13,13 @@ peerDependencyRules:
 # The msw script only copies the browser worker for `msw.workerDirectory`; the tests use msw/node.
 # The @apollo/protobufjs script (via @apollo/server) only creates a folder for the protobufjs CLI
 # and checks the version scheme of its parent package.
+# @sentry/cli (source map upload) also loads its binary from a prebuilt platform package; its script
+# downloads the binary from the Sentry CDN only when that package is missing.
 ignoredBuiltDependencies:
   - '@apollo/protobufjs'
   - '@parcel/watcher'
   - '@prisma/engines'
+  - '@sentry/cli'
   - '@swc/core'
   - esbuild
   - msw

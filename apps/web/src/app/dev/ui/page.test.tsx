@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
 import { renderWithProviders } from '@/test/render';
 import DevUiPage from './page';
@@ -68,6 +69,26 @@ describe('DevUiPage', () => {
     const { container } = renderWithProviders(<DevUiPage />, { route: '/dev/ui' });
 
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('throws an uncaught test error from the "Throw test error" button', async () => {
+    const user = userEvent.setup();
+    const messages: string[] = [];
+    // Sentry's global handler listens to the same event; preventDefault keeps jsdom from logging it.
+    const onError = (event: ErrorEvent) => {
+      event.preventDefault();
+      messages.push(event.message);
+    };
+    window.addEventListener('error', onError);
+    renderWithProviders(<DevUiPage />, { route: '/dev/ui' });
+
+    try {
+      await user.click(screen.getByRole('button', { name: 'Throw test error' }));
+    } finally {
+      window.removeEventListener('error', onError);
+    }
+
+    expect(messages).toEqual([expect.stringContaining('Sentry test error from /dev/ui')]);
   });
 
   it('is not found in production', () => {

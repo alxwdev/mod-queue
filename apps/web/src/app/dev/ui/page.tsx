@@ -25,6 +25,7 @@ import {
   SheetExample,
   ToastExamples,
 } from './overlay-examples';
+import { ThrowTestErrorButton } from './throw-test-error-button';
 
 export const metadata: Metadata = {
   title: 'UI showcase · ModQueue',
@@ -505,6 +506,16 @@ export default function DevUiPage() {
             <ToastExamples />
           </Example>
         </ComponentSection>
+      </section>
+
+      <section aria-labelledby="monitoring" className="space-y-3">
+        <h2 id="monitoring" className="text-lg font-semibold">
+          Monitoring
+        </h2>
+        <p className="text-sm text-fg-muted">
+          Throws an error in a click handler. With a Sentry DSN, the error appears in Sentry.
+        </p>
+        <ThrowTestErrorButton />
       </section>
     </main>
   );

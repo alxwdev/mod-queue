@@ -1,5 +1,7 @@
 import 'server-only';
 import { createGraphQLHandler, type FetchHandler, systemClock } from '@modqueue/api';
+import { captureException, flush } from '@sentry/nextjs';
+import { after } from 'next/server';
 import { getPrisma } from '@/server/prisma';
 
 let handler: FetchHandler | undefined;
@@ -10,10 +12,17 @@ export function handleGraphQLRequest(request: Request): Promise<Response> {
   // then needs no DATABASE_URL.
   handler ??= createGraphQLHandler({
     prisma: getPrisma(),
-    // A no-op until task 5.1 connects Sentry.
-    reportError: () => undefined,
+    reportError: (error, { operationName }) => {
+      captureException(
+        error,
+        operationName ? { tags: { 'graphql.operation': operationName } } : undefined,
+      );
+    },
     isProduction: process.env.NEXT_PUBLIC_APP_ENV === 'production',
     now: systemClock,
   });
+  // Sentry wraps route handlers only in webpack builds, and Vercel can freeze the function after
+  // the response: send this request's errors and spans before that.
+  after(() => flush(2000));
   return handler(request);
 }

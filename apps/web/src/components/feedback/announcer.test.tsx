@@ -43,10 +43,19 @@ describe('AnnouncerProvider', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(region).toHaveTextContent('Saved'));
+    // The region is empty only until the next frame, and a slow click can outlast a frame: hold
+    // the frame and run it by hand.
+    const frames: FrameRequestCallback[] = [];
+    const requestFrame = jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((callback) => frames.push(callback));
     await user.click(screen.getByRole('button', { name: 'Save' }));
+    requestFrame.mockRestore();
 
     expect(region).toBeEmptyDOMElement();
-    await waitFor(() => expect(region).toHaveTextContent('Saved'));
+    expect(frames).toHaveLength(1);
+    frames.forEach((frame) => frame(performance.now()));
+    expect(region).toHaveTextContent('Saved');
   });
 
   it('announces an assertive message in the assertive region', async () => {
